@@ -1,6 +1,6 @@
-#pragma once 
+#pragma once
 #include "Socket.hpp"
-#include <iostream> 
+
 
 class Client
 {
@@ -28,6 +28,11 @@ class Client
     ~Client()
     {
       _sock.Close();
+    }
+
+    int GetSocket()
+    {
+      return _sock.GetSock();
     }
 
   private:

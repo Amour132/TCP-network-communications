@@ -28,7 +28,7 @@ class Socket
       return true;
     }
 
-    bool Bindconst (std::string& ip,int port)
+    bool Bind(std::string& ip,int port)
     {
       sockaddr_in addr;
       addr.sin_family = AF_INET;
@@ -54,7 +54,7 @@ class Socket
       return true;
     }
 
-    bool Accept(Socket* peer,std::string* ip = NULL,int *port = NULL)
+    bool Accept(Socket* peer,std::string* ip = NULL,int* port = NULL)
     {
       sockaddr_in peer_addr;
       socklen_t len = sizeof(peer_addr);
@@ -64,11 +64,11 @@ class Socket
         return false;
       }
       peer->_sock = new_sock;
-      if(*ip != NULL)
+      if(ip != NULL)
       {
         *ip = inet_ntoa(peer_addr.sin_addr);
       }
-      if(*port != NULL)
+      if(port != NULL)
       {
         *port = ntohs(peer_addr.sin_port);
       }
@@ -107,12 +107,12 @@ class Socket
       return true;
     }
 
-    bool Connect()
+    bool Connect(const std::string& ip,int port)
     {
       sockaddr_in addr;
       addr.sin_family = AF_INET;
-      addr.sin_addr.s_addr = inet_addr(_ip.c_str());
-      addr.sin_port = htons(_port);
+      addr.sin_addr.s_addr = inet_addr(ip.c_str());
+      addr.sin_port = htons(port);
       int ret = connect(_sock,(sockaddr*)&addr,sizeof(addr));
       if(ret < 0)
       {
@@ -120,6 +120,11 @@ class Socket
         return false;
       }
       return true;
+    }
+
+    int GetSock()
+    {
+      return _sock;
     }
     
     void Close()

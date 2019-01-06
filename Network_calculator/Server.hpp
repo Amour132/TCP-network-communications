@@ -1,9 +1,10 @@
 #pragma once 
 
+#include "comm.hpp"
 #include "Socket.hpp"
 #include <functional>
 
-typedef std::function<void (const std::string& req,std::string* resp)> Handler;
+typedef std::function<void (Rq& req,Rsp* resp)> Handler;
 
 class Server
 {
@@ -21,28 +22,34 @@ class Server
         Socket new_sock;
         std::string ip;
         int port = 0;
-        if(!_sock.Accept(new_sock,&ip,&port))
+        if(!_sock.Accept(&new_sock,&ip,&port))
         {
           continue;
         }
         cout << "Get a new..." << endl;
         for(;;)
         {
-          std::string req;
-          int ret = new_sock.Recv(&req);
+          Rq req;
+          ssize_t ret = read(new_sock.GetSock(),&req,sizeof(req));
           if(ret < 0)
           {
             cout << "disconnect" << endl;
             new_sock.Close();
             break;
-          } 
-          std::string resp;
+          }
+          Rsp resp;
           handler(req,&resp);
-          new_sock.Send(resp);
+          write(new_sock.GetSock(),&resp,sizeof(resp));
         }
       }
       return true;
     }
+
+    int GetSocket()
+    {
+      return _sock.GetSock();
+    }
+
   private:
       std::string _ip;
       int _port;
